@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html class="light" lang="ca">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Despeses App</title>
+    <link rel="icon" type="image/png" href="./Ico_app_Despeses.png">
+    <link rel="apple-touch-icon" href="./Ico_app_Despeses.png">
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#73787b",
+                        "on-primary-fixed-variant": "#3a4951",
+                        "tertiary-fixed-dim": "#b9c9d2",
+                        "secondary-fixed": "#ffdea5",
+                        "on-surface-variant": "#43474a",
+                        "secondary-fixed-dim": "#e9c176",
+                        "primary-fixed-dim": "#b9c9d3",
+                        "on-error-container": "#93000a",
+                        "surface-container-low": "#f3f4f5",
+                        "on-primary-fixed": "#0e1d25",
+                        "surface-variant": "#e1e3e4",
+                        "tertiary-fixed": "#d5e5ee",
+                        "on-secondary-fixed-variant": "#5d4201",
+                        "tertiary": "#1a282f",
+                        "on-tertiary-fixed-variant": "#3a4950",
+                        "primary-fixed": "#d5e5ef",
+                        "surface-container-high": "#e7e8e9",
+                        "on-secondary-fixed": "#261900",
+                        "inverse-primary": "#b9c9d3",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9fa",
+                        "primary": "#192830",
+                        "error-container": "#ffdad6",
+                        "inverse-surface": "#2e3132",
+                        "tertiary-container": "#2f3e45",
+                        "surface-container": "#edeeef",
+                        "on-primary-container": "#99a9b2",
+                        "primary-container": "#2f3e46",
+                        "secondary-container": "#fed488",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f8f9fa",
+                        "secondary": "#775a19",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#99a9b1",
+                        "outline-variant": "#c3c7ca",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-tertiary-fixed": "#0f1d24",
+                        "surface-bright": "#f8f9fa",
+                        "on-background": "#191c1d",
+                        "on-surface": "#191c1d",
+                        "on-secondary-container": "#785a1a",
+                        "surface-tint": "#516169",
+                        "surface-dim": "#d9dadb"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface font-body text-on-surface min-h-screen pb-32">
+    
+    <!-- TopAppBar Global -->
+    <header id="main-header" class="fixed top-0 w-full z-50 bg-slate-50/70 dark:bg-slate-900/70 backdrop-blur-md flex justify-between items-center px-6 py-4 transition-colors">
+        <div class="flex items-center gap-3">
+            <div id="header-icon-container" class="flex items-center justify-center w-10 h-10 rounded-full bg-surface-container-high text-primary cursor-pointer hover:opacity-80 transition-opacity">
+                <span id="header-icon" class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+            </div>
+        </div>
+        <h1 class="text-xl font-extrabold tracking-[0.2em] text-slate-900 dark:text-slate-50 uppercase font-headline">DESPESES</h1>
+        <div class="flex items-center gap-2">
+            <button id="header-add-btn" aria-label="Nova Despesa" onclick="app.resetExpenseForm(); app.navigate('add-expense')" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-500 text-white hover:scale-105 active:scale-95 transition-all shadow-md">
+                <span class="material-symbols-outlined font-bold">add</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="app-container" class="pt-24 px-6 max-w-5xl mx-auto space-y-12">
+        
+        <!-- =================== VIEW: DASHBOARD (Resum) =================== -->
+        <section id="view-dashboard" class="view-section active">
+            <!-- Hero Section -->
+            <section class="text-center space-y-2 pt-4">
+                <p class="font-label text-on-surface-variant uppercase tracking-[0.2em] text-xs font-bold w-full">Saldo Disponible</p>
+                <div class="relative inline-block mt-2">
+                    <h2 class="font-headline font-extrabold text-6xl md:text-8xl tracking-tighter text-primary">
+                        <span id="dashboard-total">0,00</span><span class="text-3xl md:text-4xl align-top ml-1"> €</span>
+                    </h2>
+                </div>
+                
+                <!-- GLOBAL BALANCES -->
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mt-8">
+                    <div class="bg-surface-container-low px-5 py-3 rounded-full border border-outline-variant/10 flex items-center gap-3 shadow-sm min-w-[160px] justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px] text-green-700">payments</span>
+                            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Efectiu</span>
+                        </div>
+                        <span id="balance-cash" class="font-bold text-primary font-headline">0,00€</span>
+                    </div>
+                    <div class="bg-surface-container-low px-5 py-3 rounded-full border border-outline-variant/10 flex items-center gap-3 shadow-sm min-w-[160px] justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[18px] text-blue-700">credit_card</span>
+                            <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">Banc</span>
+                        </div>
+                        <span id="balance-bank" class="font-bold text-primary font-headline">0,00€</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Month Selector & Bento Grid Layout -->
+            <div class="flex items-center justify-between border-b border-outline-variant/10 pb-4 mt-12 mb-6">
+                <h2 class="text-2xl font-bold font-headline text-primary hidden md:block">Resum del Mes</h2>
+                <div class="flex items-center justify-center gap-4 bg-surface-container-low rounded-full px-2 py-1 shadow-sm border border-outline-variant/10 mx-auto md:mx-0">
+                    <button onclick="app.changeMonth(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+                    <p id="dashboard-month" class="font-label text-primary uppercase tracking-[0.1em] text-xs font-bold w-24 text-center">Gener</p>
+                    <button onclick="app.changeMonth(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                <!-- Expense Distribution (Donut Chart) -->
+                <div class="md:col-span-5 bg-surface-container-low rounded-xl p-8 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-headline font-bold text-xl text-primary">Distribució</h3>
+                        <span class="material-symbols-outlined text-on-surface-variant">pie_chart</span>
+                    </div>
+                    
+                    <div class="relative flex justify-center items-center py-4">
+                        <svg class="w-48 h-48 transform -rotate-90" viewBox="0 0 36 36" id="donut-svg">
+                            <circle cx="18" cy="18" fill="transparent" r="15.915" stroke="#e1e3e4" stroke-width="3"></circle>
+                            <!-- Dynamic segments will be injected here by JS -->
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="donut-center-text" class="text-2xl font-bold font-headline">0%</span>
+                            <span class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Gastat</span>
+                        </div>
+                    </div>
+
+                    <div id="donut-legend" class="space-y-3">
+                        <!-- Legend items injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Categories and Progress -->
+                <div class="md:col-span-7 space-y-6">
+                    <h3 class="font-headline font-bold text-xl text-primary px-2">Pressupostos Actius</h3>
+                    <div id="budget-progress-list" class="grid grid-cols-1 gap-4">
+                        <!-- Budget cards injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vertical Bar Chart Section -->
+            <section class="space-y-6 mt-12">
+                <div class="flex justify-between items-end px-2">
+                    <h3 class="font-headline font-bold text-xl text-primary">Despesa per Dia</h3>
+                </div>
+                <div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+                    <div id="daily-bar-chart" class="h-48 flex items-end justify-between gap-1 overflow-x-auto hide-scrollbar pb-2">
+                        <!-- Bars injected by JS -->
+                    </div>
+                    <div class="flex justify-between text-[10px] uppercase font-bold text-on-surface-variant mt-2 border-t border-outline-variant/20 pt-2 px-1">
+                        <span>1</span>
+                        <span>Dia del mes</span>
+                        <span>31</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recent Activity Section -->
+            <section class="space-y-6 mt-12">
+                <div class="flex justify-between items-end px-2">
+                    <h3 class="font-headline font-bold text-xl text-primary">Activitat Recent</h3>
+                    <button onclick="app.navigate('history')" class="text-xs font-bold uppercase tracking-widest text-secondary hover:opacity-70 transition-all">Veure Tot</button>
+                </div>
+                <div class="bg-surface-container-low rounded-xl overflow-hidden">
+                    <div id="recent-activity-list" class="divide-y divide-outline-variant/10">
+                        <!-- Recent transactions injected by JS -->
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- =================== VIEW: HISTORY (Historial) =================== -->
+        <section id="view-history" class="view-section hidden">
+            <!-- Page Title -->
+            <div class="mb-10">
+                <h1 class="text-4xl font-headline font-extrabold text-primary tracking-tight mb-2">Historial</h1>
+                <p class="text-on-surface-variant font-medium">Control total dels teus moviments i inversions familiars.</p>
+            </div>
+
+            <!-- Search & Quick Filters -->
+            <section class="space-y-6 mb-12">
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-on-surface-variant">
+                        <span class="material-symbols-outlined">search</span>
+                    </div>
+                    <input id="history-search" class="w-full bg-surface-container-lowest border-none rounded-xl py-4 pl-12 pr-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-secondary/20 transition-all placeholder:text-outline-variant font-body" placeholder="Cerca un concepte o comerç..." type="text"/>
+                </div>
+                <div id="history-filters" class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+                    <!-- Filters injected by JS -->
+                </div>
+            </section>
+
+            <!-- Transactions List -->
+            <div id="history-list" class="space-y-8">
+                <!-- Grouped transactions injected by JS -->
+            </div>
+        </section>
+
+        <!-- =================== VIEW: ANNUAL (Anual) =================== -->
+        <section id="view-annual" class="view-section hidden">
+            <header class="mb-10 text-center">
+                <h1 class="font-headline text-4xl font-extrabold text-primary tracking-tight mb-2">Resum Anual</h1>
+                <div class="flex items-center justify-center gap-4">
+                    <button onclick="app.changeYear(-1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant"><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+                    <p id="annual-year-text" class="text-on-surface-variant text-lg font-bold w-16">2026</p>
+                    <button onclick="app.changeYear(1)" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors text-on-surface-variant"><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+                </div>
+            </header>
+
+            <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <!-- Total Expenses -->
+                <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_40px_60px_rgba(25,28,29,0.04)] border border-outline-variant/10">
+                    <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4">Despeses Totals</p>
+                    <div class="flex items-baseline gap-1">
+                        <span id="annual-total" class="font-headline text-3xl font-bold text-primary">0</span>
+                        <span class="text-secondary font-semibold">€</span>
+                    </div>
+                </div>
+                <!-- Average Monthly -->
+                <div class="bg-surface-container-lowest p-8 rounded-xl shadow-[0_40px_60px_rgba(25,28,29,0.04)] border border-outline-variant/10">
+                    <p class="font-label text-xs uppercase tracking-widest text-on-surface-variant mb-4">Mitjana Mensual</p>
+                    <div class="flex items-baseline gap-1">
+                        <span id="annual-average" class="font-headline text-3xl font-bold text-primary">0</span>
+                        <span class="text-secondary font-semibold">€/mes</span>
+                    </div>
+                </div>
+                <!-- Net Balance / Save focus (Placeholder logic for now) -->
+                <div class="relative overflow-hidden bg-primary-container p-8 rounded-xl shadow-[0_40px_60px_rgba(25,40,48,0.08)] border border-outline-variant/10">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+                    <p class="font-label text-xs uppercase tracking-widest text-on-primary-container mb-4">Pressupost Anual</p>
+                    <div class="flex items-baseline gap-1">
+                        <span id="annual-budget-diff" class="font-headline text-3xl font-bold text-on-primary">...</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Monthly Evolution Chart -->
+            <section class="mb-12">
+                <div class="bg-surface-container-low p-8 rounded-xl">
+                    <div class="flex justify-between items-end mb-10">
+                        <div>
+                            <h2 class="font-headline text-2xl font-bold text-primary tracking-tight">Evolució Mensual</h2>
+                            <p class="text-on-surface-variant text-sm">Distribució de despeses per mes</p>
+                        </div>
+                    </div>
+                    <div id="annual-chart-container" class="h-64 flex items-end justify-between gap-1 overflow-visible border-b border-outline-variant/20 pt-10">
+                        <!-- Chart bars injected here via JS -->
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- =================== VIEW: SETTINGS (Configuració) =================== -->
+        <section id="view-settings" class="view-section hidden">
+            <section class="mb-10">
+                <h1 class="text-4xl font-extrabold tracking-tight text-primary mb-2">Configuració</h1>
+                <p class="text-on-surface-variant">Gestioneu les vostres preferències i categories de despeses.</p>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-5 space-y-8">
+                    <!-- General Preferences -->
+                    <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/10">
+                        <h2 class="text-lg font-bold text-primary mb-6">Preferències Generals</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary">dark_mode</span>
+                                    <span class="font-medium">Mode Nit</span>
+                                </div>
+                                <button id="btn-toggle-dark" class="w-12 h-6 bg-surface-container-high rounded-full relative transition-colors duration-300">
+                                    <span class="absolute right-1 top-1 w-4 h-4 bg-primary rounded-full transition-transform"></span>
+                                </button>
+                            </div>
+                            
+                            <div class="pt-4 border-t border-outline-variant/10">
+                                <button id="btn-clear-data" class="flex items-center gap-2 text-error font-bold text-sm hover:opacity-70 transition-opacity">
+                                    <span class="material-symbols-outlined">delete_forever</span>
+                                    Esborrar Totes les Dades
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add/Edit Category Form -->
+                    <div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm border border-outline-variant/10">
+                        <h2 id="form-category-title" class="text-lg font-bold text-primary mb-6">Nova Categoria</h2>
+                        <form id="form-add-category" class="space-y-6">
+                            <input type="hidden" id="cat-id" value="">
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">Nom de la Categoria</label>
+                                <input id="cat-name" required class="w-full bg-transparent border-b border-outline-variant focus:border-secondary outline-none py-2 transition-colors placeholder:text-outline-variant/50" placeholder="ex. Alimentació" type="text"/>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">Límit Mensual (Opcional)</label>
+                                <div class="flex items-center border-b border-outline-variant focus-within:border-secondary transition-colors">
+                                    <input id="cat-limit" class="w-full bg-transparent outline-none py-2" placeholder="0.00" type="number" step="1"/>
+                                    <span class="text-on-surface-variant pl-2">€</span>
+                                </div>
+                            </div>
+                            <!-- Icon Selection -->
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">Icona</label>
+                                <div id="cat-icon-picker" class="flex flex-wrap gap-2 py-2">
+                                    <button type="button" data-icon="restaurant" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-high text-primary flex items-center justify-center transition-all ring-2 ring-offset-2 ring-primary"><span class="material-symbols-outlined">restaurant</span></button>
+                                    <button type="button" data-icon="shopping_cart" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">shopping_cart</span></button>
+                                    <button type="button" data-icon="home" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">home</span></button>
+                                    <button type="button" data-icon="flight" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">flight</span></button>
+                                    <button type="button" data-icon="local_hospital" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">local_hospital</span></button>
+                                    <button type="button" data-icon="payments" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">payments</span></button>
+                                    <button type="button" data-icon="school" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">school</span></button>
+                                    <button type="button" data-icon="menu_book" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">menu_book</span></button>
+                                    <button type="button" data-icon="smart_display" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">smart_display</span></button>
+                                    <button type="button" data-icon="apps" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">apps</span></button>
+                                    <button type="button" data-icon="local_cafe" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">local_cafe</span></button>
+                                    <button type="button" data-icon="bolt" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">bolt</span></button>
+                                    <button type="button" data-icon="smartphone" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">smartphone</span></button>
+                                    <button type="button" data-icon="local_shipping" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">local_shipping</span></button>
+                                    <button type="button" data-icon="checkroom" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">checkroom</span></button>
+                                    <button type="button" data-icon="directions_car" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">directions_car</span></button>
+                                    <button type="button" data-icon="pets" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">pets</span></button>
+                                    <button type="button" data-icon="fitness_center" class="icon-btn w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/20 text-on-surface-variant flex items-center justify-center transition-all hover:bg-surface-container-high"><span class="material-symbols-outlined">fitness_center</span></button>
+                                </div>
+                                <input type="hidden" id="cat-icon" value="restaurant">
+                            </div>
+                            <!-- Color Selection -->
+                            <div>
+                                <label class="block text-[10px] uppercase tracking-widest font-bold text-on-surface-variant mb-1">Color</label>
+                                <div id="cat-color-picker" class="flex flex-wrap gap-2 py-2">
+                                    <button type="button" data-color="bg-primary-fixed" data-text="text-on-primary-fixed-variant" class="color-btn w-6 h-6 rounded-full bg-primary-fixed ring-2 ring-offset-2 ring-primary transition-all"></button>
+                                    <button type="button" data-color="bg-secondary-fixed" data-text="text-on-secondary-fixed-variant" class="color-btn w-6 h-6 rounded-full bg-secondary-fixed opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-error-container" data-text="text-error" class="color-btn w-6 h-6 rounded-full bg-error-container opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-tertiary-fixed-dim" data-text="text-on-tertiary-fixed" class="color-btn w-6 h-6 rounded-full bg-tertiary-fixed-dim opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-secondary-container" data-text="text-on-secondary-container" class="color-btn w-6 h-6 rounded-full bg-secondary-container opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-blue-200" data-text="text-blue-900" class="color-btn w-6 h-6 rounded-full bg-blue-200 opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-green-200" data-text="text-green-900" class="color-btn w-6 h-6 rounded-full bg-green-200 opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-purple-200" data-text="text-purple-900" class="color-btn w-6 h-6 rounded-full bg-purple-200 opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-pink-200" data-text="text-pink-900" class="color-btn w-6 h-6 rounded-full bg-pink-200 opacity-60 hover:opacity-100 transition-all"></button>
+                                    <button type="button" data-color="bg-orange-200" data-text="text-orange-900" class="color-btn w-6 h-6 rounded-full bg-orange-200 opacity-60 hover:opacity-100 transition-all"></button>
+                                </div>
+                                <input type="hidden" id="cat-color" value="bg-primary-fixed">
+                                <input type="hidden" id="cat-text-color" value="text-on-primary-fixed-variant">
+                            </div>
+                            
+                            <div class="flex gap-3">
+                                <button type="button" id="btn-cancel-edit" class="hidden flex-1 bg-surface-container-high text-primary py-3 rounded-full font-bold hover:opacity-90 transition-all">Cancel·lar</button>
+                                <button type="submit" id="btn-submit-category" class="flex-2 w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-3 rounded-full font-bold shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">save</span> Guardar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold text-primary">Categories Existents</h2>
+                    </div>
+                    <!-- Categories list -->
+                    <div id="settings-categories-list" class="space-y-3">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================== VIEW: ADD EXPENSE (Nova Despesa) =================== -->
+        <section id="view-add-expense" class="view-section hidden max-w-2xl mx-auto align-top">
+            <section class="mb-10 text-left pt-4">
+                <span class="text-secondary font-headline font-bold text-sm tracking-widest uppercase mb-2 block">Nova Transacció</span>
+                <h2 id="add-expense-title" class="text-primary font-headline font-extrabold text-4xl lg:text-5xl leading-tight">Afegir Despesa / Ingrés</h2>
+            </section>
+            
+            <div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0_4px_20px_rgba(25,28,29,0.04)] border border-outline-variant/15">
+                <form id="form-add-expense" class="space-y-10">
+                    <input type="hidden" id="exp-id" value="">
+
+                    <!-- Tipus de Transacció (Despesa / Ingrés) -->
+                    <div class="flex bg-surface-container-high rounded-xl p-1 relative shadow-inner">
+                        <label class="flex-1 text-center cursor-pointer relative z-10">
+                            <input type="radio" name="exp-type" value="expense" class="peer hidden" checked onchange="app.toggleTransactionType()">
+                            <div class="py-2.5 rounded-lg text-sm font-bold text-on-surface-variant peer-checked:text-primary transition-all">Despesa</div>
+                        </label>
+                        <label class="flex-1 text-center cursor-pointer relative z-10">
+                            <input type="radio" name="exp-type" value="income" class="peer hidden" onchange="app.toggleTransactionType()">
+                            <div class="py-2.5 rounded-lg text-sm font-bold text-on-surface-variant peer-checked:text-primary transition-all">Ingrés (+ Diners)</div>
+                        </label>
+                        <!-- Slider background -->
+                        <div id="type-slider" class="absolute top-1 left-1 bottom-1 w-[calc(50%-4px)] bg-surface-container-lowest rounded-lg shadow-sm border border-outline-variant/20 transition-transform duration-300"></div>
+                    </div>
+
+                    <!-- Mètode -->
+                    <div class="group">
+                        <label class="block text-on-surface-variant font-label text-xs font-semibold uppercase tracking-wider mb-2">Mètode</label>
+                        <div class="flex gap-4">
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="exp-method" value="cash" class="peer hidden" checked>
+                                <div class="py-3 px-4 border border-outline-variant/30 rounded-xl text-center text-sm font-bold text-on-surface-variant peer-checked:border-secondary peer-checked:bg-secondary/10 peer-checked:text-secondary transition-all flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">payments</span> Efectiu
+                                </div>
+                            </label>
+                            <label class="flex-1 cursor-pointer">
+                                <input type="radio" name="exp-method" value="bank" class="peer hidden">
+                                <div class="py-3 px-4 border border-outline-variant/30 rounded-xl text-center text-sm font-bold text-on-surface-variant peer-checked:border-secondary peer-checked:bg-secondary/10 peer-checked:text-secondary transition-all flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-[18px]">credit_card</span> Targeta/Banc
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Import -->
+                    <div class="relative group">
+                        <label class="block text-on-surface-variant font-label text-xs font-semibold uppercase tracking-wider mb-2">Import (€)</label>
+                        <div class="flex items-baseline gap-2 border-b border-outline-variant group-focus-within:border-secondary transition-colors duration-300 pb-2">
+                            <span class="text-4xl font-headline font-extrabold text-primary">€</span>
+                            <input id="exp-amount" required class="w-full bg-transparent border-none p-0 text-5xl font-headline font-extrabold text-primary focus:ring-0 placeholder:text-outline-variant/30 text-left" placeholder="0,00" step="0.01" type="number" autofocus/>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Data -->
+                        <div class="group">
+                            <label class="block text-on-surface-variant font-label text-xs font-semibold uppercase tracking-wider mb-2">Data</label>
+                            <div class="relative flex items-center border-b border-outline-variant group-focus-within:border-secondary transition-colors duration-300 pb-2">
+                                <span class="material-symbols-outlined text-on-surface-variant mr-3">calendar_today</span>
+                                <input id="exp-date" required class="w-full bg-transparent border-none p-0 text-primary font-medium focus:ring-0" type="date"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Categoria -->
+                        <div id="category-container" class="group transition-all duration-300">
+                            <label class="block text-on-surface-variant font-label text-xs font-semibold uppercase tracking-wider mb-2">Categoria</label>
+                            <div class="relative flex items-center border-b border-outline-variant group-focus-within:border-secondary transition-colors duration-300 pb-2">
+                                <span class="material-symbols-outlined text-on-surface-variant mr-3">category</span>
+                                <select id="exp-category" required class="w-full bg-transparent border-none p-0 text-primary font-medium focus:ring-0 appearance-none" style="-webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: none !important;">
+                                    <!-- Injected by JS -->
+                                </select>
+                                <span class="material-symbols-outlined absolute right-0 pointer-events-none text-outline">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Concepte -->
+                    <div class="group">
+                        <label class="block text-on-surface-variant font-label text-xs font-semibold uppercase tracking-wider mb-2">Concepte</label>
+                        <div class="relative flex items-center border-b border-outline-variant group-focus-within:border-secondary transition-colors duration-300 pb-2">
+                            <span class="material-symbols-outlined text-on-surface-variant mr-3">edit_note</span>
+                            <input id="exp-concept" required class="w-full bg-transparent border-none p-0 text-primary font-medium focus:ring-0 placeholder:text-outline-variant/50" placeholder="Ex: Compra setmanal" type="text"/>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit -->
+                    <div class="pt-6 flex gap-3">
+                        <button type="button" id="btn-cancel-expense-edit" class="hidden flex-1 bg-surface-container-high text-primary py-5 rounded-full font-bold hover:opacity-90 transition-all">Cancel·lar</button>
+                        <button type="submit" class="flex-2 w-full py-5 rounded-full bg-gradient-to-r from-primary to-primary-container text-on-primary font-headline font-bold text-lg shadow-lg hover:opacity-90 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3">
+                            <span class="material-symbols-outlined">save</span>
+                            <span id="submit-btn-text">Guardar Despesa</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- BottomNavBar Global -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-slate-50/90 dark:bg-slate-900/90 backdrop-blur-xl z-50 rounded-t-3xl shadow-[0_-4px_20px_rgba(0,0,0,0.05)] border-t border-slate-200/20 dark:border-slate-700/20 transition-transform duration-300">
+        <a id="nav-dashboard" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-primary opacity-60 hover:opacity-100 px-4 py-2 cursor-pointer" onclick="app.navigate('dashboard')">
+            <span class="material-symbols-outlined mb-1">dashboard</span>
+            <span class="font-body text-[11px] font-medium tracking-wide">Resum</span>
+        </a>
+        <a id="nav-history" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-primary opacity-60 hover:opacity-100 px-4 py-2 cursor-pointer" onclick="app.navigate('history')">
+            <span class="material-symbols-outlined mb-1">receipt_long</span>
+            <span class="font-body text-[11px] font-medium tracking-wide">Historial</span>
+        </a>
+        
+        <!-- Center Floating Action Button placeholder for visual balance using the Add Expense View design pattern -->
+        <div id="nav-fab-container" class="relative -top-6 hidden">
+            <button onclick="app.navigate('add-expense')" class="w-14 h-14 rounded-full bg-slate-500 text-white shadow-xl flex items-center justify-center active:scale-90 duration-150 ring-4 ring-background">
+                <span class="material-symbols-outlined text-2xl font-bold">add</span>
+            </button>
+        </div>
+
+        <a id="nav-annual" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-primary opacity-60 hover:opacity-100 px-4 py-2 cursor-pointer" onclick="app.navigate('annual')">
+            <span class="material-symbols-outlined mb-1">calendar_month</span>
+            <span class="font-body text-[11px] font-medium tracking-wide">Anual</span>
+        </a>
+        <a id="nav-settings" class="nav-item flex flex-col items-center justify-center text-slate-500 hover:text-primary opacity-60 hover:opacity-100 px-4 py-2 cursor-pointer" onclick="app.navigate('settings')">
+            <span class="material-symbols-outlined mb-1">settings</span>
+            <span class="font-body text-[11px] font-medium tracking-wide">Config</span>
+        </a>
+    </nav>
+
+    <!-- Scripts -->
+    <script src="js/store.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
