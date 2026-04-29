@@ -837,3 +837,84 @@ window.app = app;
 document.addEventListener('DOMContentLoaded', () => {
     app.init();
 });
+
+// ===== EXPORTACIÓ CSV PER A EXCEL =====
+function exportCSV() {
+    const expenses = Store.getExpenses().filter(item => (item.type || 'expense') === 'expense');
+    const categories = Store.getCategories();
+    const categoryById = {};
+    categories.forEach(cat => categoryById[cat.id] = cat.name);
+
+    if (expenses.length === 0) {
+        alert('No hi ha microdespeses per exportar.');
+        return;
+    }
+
+    const headers = [
+        'Data',
+        'Mes',
+        'Any',
+        'Categoria',
+        'Subcategoria',
+        'Tipus moviment',
+        'Tipus despesa',
+        'Import',
+        'Pagament',
+        'Comentaris'
+    ];
+
+    const rows = expenses.map(item => {
+        const data = item.date || '';
+        const parts = data.split('-');
+        const any = parts.length === 3 ? parts[0] : '';
+        const mes = parts.length === 3 ? `${parts[0]}-${parts[1]}` : '';
+        const subcategoria = categoryById[item.category] || item.category || 'Altres';
+        const metode = item.method === 'card' ? 'Targeta' : 'Efectiu';
+
+        return [
+            data,
+            mes,
+            any,
+            'Microdespeses',
+            subcategoria,
+            'Despesa',
+            'Variable',
+            item.amount || '',
+            metode,
+            item.concept || ''
+        ];
+    });
+
+    const csv = [headers, ...rows]
+        .map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(';'))
+        .join('\n');
+
+    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+
+    link.href = URL.createObjectURL(blob);
+    link.download = 'microdespeses_app.csv';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function loadSampleDataAndReload() {
+    if (confirm('Això carregarà dades fictícies de mostra i substituirà les dades actuals. Vols continuar?')) {
+        Store.loadSampleData();
+        location.reload();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const exportBtn = document.getElementById('btn-export-csv');
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportCSV);
+    }
+
+    const sampleBtn = document.getElementById('btn-load-sample');
+    if (sampleBtn) {
+        sampleBtn.addEventListener('click', loadSampleDataAndReload);
+    }
+});
